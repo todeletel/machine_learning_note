@@ -62,19 +62,47 @@ Theta2_grad = zeros(size(Theta2));
 %               and Theta2_grad from Part 2.
 %
 
+t1 = Theta1(:,2:size(Theta1,2));
+t2 = Theta2(:,2:size(Theta2,2));
+
+reg_cost = lambda * (sum(sum(t1.^2)) + sum(sum(t2.^2))) / (2 * m);
+
+h1 = sigmoid([ones(m, 1) X] * Theta1');
+h2 = sigmoid([ones(m, 1) h1] * Theta2');
+J_tmp = 0;
+
+for c = 1:num_labels
+  h_k = h2(:,c);
+  y_true = y == c;
+  J_tmp = J_tmp + sum(-y_true .* log(h_k) - (1-y_true) .* log(1-h_k))./m;
+end
+
+
+for i = 1:m
+  y_temp = zeros(1, num_labels); 
+  y_temp(y(i)) = 1;
+  a1=X(i,:);
+
+  t_h1 = sigmoid([1 a1] * Theta1');
+  t_h2 = sigmoid([1 t_h1] * Theta2');
+  
+  % back propagation
+  delta3  =  t_h2 - y_temp; 
+  delta2  =  delta3 * Theta2(:,2:end) .* sigmoidGradient([1 a1] * Theta1');
+  
+  Theta1_grad = Theta1_grad + delta2' * [1 a1];
+  Theta2_grad = Theta2_grad + delta3' * [1 t_h1];
+end
+
+
+Theta1_grad = (1/m).*Theta1_grad;
+Theta1_grad(:,2:end) = Theta1_grad(:,2:end) + (lambda/m).*Theta1(:,2:end);
+Theta2_grad = (1/m).*Theta2_grad;
+Theta2_grad(:,2:end) = Theta2_grad(:,2:end) + (lambda/m).*Theta2(:,2:end);
 
 
 
-
-
-
-
-
-
-
-
-
-
+J = J_tmp + reg_cost;
 
 
 
