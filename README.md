@@ -1,2 +1,2 @@
 # machine_learning_note
-machine note
+Coursera machine learning solution and notebook.
